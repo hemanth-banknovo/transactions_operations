@@ -1,0 +1,13 @@
+select		
+--	extract(month from transaction_date AT TIME ZONE 'EST') as month_nbr,	
+--	to_char(transaction_date AT TIME ZONE 'EST','Mon') AS month,	
+--	extract(year from transaction_date AT TIME ZONE 'EST') as yyyy,
+COUNT(amount),		
+SUM((amount))		
+from transactions		
+where medium = 'POS Withdrawal'		
+and status = 'active'		
+and type = 'debit'		
+and  transaction_date >= '2021-11-05' and transaction_date <= '2021-11-11'		
+--group by month_nbr, month, yyyy		
+--order by yyyy,month_nbr
