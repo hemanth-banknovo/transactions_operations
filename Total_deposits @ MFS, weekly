@@ -1,0 +1,22 @@
+WITH every_day as (SELECT d::date                     AS "date"
+                       , EXTRACT('WEEK' FROM d)::int AS "Week_No"
+                       , to_char(d, 'Dy')            AS "WeekDay_No"
+                       , (rn::int - 1) / 7 AS "week"
+                  FROM  (
+                     SELECT date_trunc('week', feb3) - interval '3 days' AS day1 -- subtract 2 days
+                          , EXTRACT('year' FROM feb3)::int * 100 + 1     AS base_nr
+                     FROM  (SELECT timestamp '2017-12-21') input(feb3)           -- add 2 days, so Feb 3 (!)
+                     ) t, generate_series (day1
+                                         , '2021-11-11'
+                                         , interval '1 day') WITH ORDINALITY AS d(d, rn)),
+daily_sum as (
+                select sum(amount), created_date::date as date
+                from transactions
+                group by created_date::DATE
+                order by date asc
+            ),
+p as (
+      SELECT ed.date date, week, coalesce(ds.sum, null) as value, sum(ds.sum) over (order by ed.date asc rows between unbounded preceding and current row) as balance
+      FROM every_day as ed LEFT JOIN daily_sum as ds on ds.date = ed.date)
+-- select * from p;
+select round(avg(balance), 2), week from p group by week order by week;
