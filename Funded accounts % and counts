@@ -1,0 +1,8 @@
+SELECT
+coalesce(meta->>'isAccountFunded','false') as funded,
+COUNT(coalesce(meta->>'isAccountFunded','false')),
+to_char((count(*) * 100.0 / sum(count(*)) OVER ()), 'FM990.00"%"') AS percent
+FROM accounts
+WHERE accounts.created_at >= '2019-08-01 00:00:00.00-05' AND accounts.created_at < '2021-11-11 00:00:00.00-05'
+GROUP BY 1
+ORDER BY 1
