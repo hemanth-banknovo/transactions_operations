@@ -1,0 +1,15 @@
+select
+extract(month from created_date) as month_nbr,
+to_char(created_date,'Mon') AS month,
+extract(year from created_date) as yyyy,
+-- b.meta->'business'->'business_type' as btype,
+COUNT(t.amount),
+SUM(ABS(t.amount))
+from transactions as t, businesses as b
+where t.business_id = b.id
+and medium = 'Returned Check'
+--and b.meta->'business'->'business_type' ? 'sole_proprietorship'
+--and created_date between ((timestamp '2021-07-02 00:00:00') AT TIME ZONE 'EDT')
+--  AND ((timestamp '2021-07-08 23:59:59') AT TIME ZONE 'EDT')
+group by month_nbr, month, yyyy, btype
+order by yyyy,month_nbr, btype
