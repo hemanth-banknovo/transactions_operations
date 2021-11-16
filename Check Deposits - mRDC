@@ -1,0 +1,21 @@
+select
+--	extract(month from created_date) as month_nbr,	
+--	to_char(created_date,'Mon') AS month,	
+--	extract(year from created_date) as yyyy,
+COUNT(amount),		
+SUM(ABS(amount))
+FROM
+	transactions
+WHERE
+	type = 'credit'
+	AND status = 'active'
+	AND LOWER(medium) IN ('new account deposit', 'deposit') 
+	AND (
+		LOWER(TRIM(description)) = 'deposit'
+		OR 
+		LOWER(description) ILIKE '%mobile check%'
+		)
+	and created_date >= '2021-11-05' and created_date <= '2021-11-11'						
+
+--group by month_nbr, month, yyyy	
+--order by yyyy, month_nbr	
