@@ -1,0 +1,7 @@
+with created as (select  transfer_id, created_at from transfer_events where event = 'created'),
+	 completed as (select transfer_id, created_at from transfer_events where event = 'processed')
+select AVG((Extract(epoch FROM (co.created_at  - cr.created_at)::interval)/3600))  as TTC
+from completed as co 
+join created as cr on cr.transfer_id = co.transfer_id
+where cr.created_at between ((timestamp '2021-10-29 00:00:00') AT TIME ZONE 'EST') 
+								 AND ((timestamp '2021-11-04 23:59:59') AT TIME ZONE 'EST')
