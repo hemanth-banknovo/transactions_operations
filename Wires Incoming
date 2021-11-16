@@ -1,0 +1,13 @@
+select		
+--	extract(month from created_date) as month_nbr,	
+--	to_char(created_date,'Mon') AS month,	
+--	extract(year from created_date) as yyyy,	
+COUNT(amount),		
+SUM((amount))		
+from transactions		
+where status = 'active'		
+and medium in ('Deposit', 'Descriptive Deposit','External Deposit','New Account Deposit')		
+and description ilike '%Wire %'		
+and created_date >= '2021-11-05' and created_date <= '2021-11-11'				
+--group by month_nbr, month, yyyy		
+--order by yyyy,month_nbr	
