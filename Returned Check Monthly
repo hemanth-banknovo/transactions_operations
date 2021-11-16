@@ -1,0 +1,10 @@
+select 
+	extract(month from created_date) as month_nbr,
+	to_char(created_date,'Mon') AS month,
+    extract(year from created_date) as yyyy,
+    COUNT(distinct business_id),
+	SUM(ABS(amount))
+from transactions
+where medium = 'Returned Check'
+group by month_nbr, month, yyyy
+order by yyyy,month_nbr 
