@@ -1,0 +1,19 @@
+WITH acc as (select business_id, balance from accounts),
+	 bus as (select id, meta, company_name, status from businesses)
+select
+/*b.id,*/
+b.company_name,
+SUM(t.amount) as SumIncoming,
+a.balance -> 'available' as current_avail_balance,
+/*count(t.amount) as NoTranx,*/
+b.meta -> 'business_questions' -> 'industry_name' as IndustryName
+from bus as b
+join acc as a on a.business_id = b.id
+join transactions as t on t.business_id = a.business_id
+where t.medium in ('Deposit', 'Descriptive Deposit','External Deposit','New Account Deposit', 'IAT Deposit','EFT Credit')
+	and t.type ='credit'
+	and b.status = 'active'
+	and t.created_date >= '2021-04-30' and t.created_date <= '2021-05-06'
+group by b.company_name, balance, IndustryName, b.id
+order by sumIncoming desc
+limit 10
