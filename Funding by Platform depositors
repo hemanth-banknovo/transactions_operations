@@ -1,0 +1,41 @@
+WITH first_credit AS(
+	SELECT 
+		to_timestamp((accounts.meta->>'accountFundedAt'),'YYYY-MM-DD"T"HH24:MI:SS"Z"')::DATE as funded_date, 
+		accounts.id as account_id, 
+		description,
+		medium, 
+		transactions.meta,
+		created_date,
+	row_number() over (partition by account_id order by created_date asc) as row_number
+	FROM accounts 
+	INNER JOIN transactions ON transactions.account_id = accounts.id
+	WHERE (accounts.meta->>'isAccountFunded')::BOOLEAN IS TRUE AND transactions.type = 'credit' AND transactions.status <> 'rejected'
+		and accounts.id in (select id
+                        from accounts where meta ->> 'accountFundedAt' notnull
+                        and TO_DATE(meta ->> 'accountFundedAt', 'YYYY-MM-DD"T"HH24:MI:SS:000"Z"') >= '2021-10-29' 
+                        and TO_DATE(meta ->> 'accountFundedAt', 'YYYY-MM-DD"T"HH24:MI:SS:000"Z"')  <= '2021-11-04')
+	and accounts.status = 'active'
+	ORDER BY created_date asc
+),
+deposit_sources AS(
+	SELECT
+		CASE
+			when (description ilike '%amzn%' 
+					or description ilike '%paypal%' 
+					or description ilike '%stripe%'
+					or description ilike '%square%'
+					or description ilike '%intuit%'
+					or description ilike '%shopify%') then 'PDer'
+		END as source,
+		funded_date
+	FROM first_credit
+	WHERE 1=1
+	AND row_number = 1
+	ORDER BY account_id, row_number
+)
+
+SELECT 
+    source, 
+    COUNT(*) 
+    FROM deposit_sources
+GROUP BY source
