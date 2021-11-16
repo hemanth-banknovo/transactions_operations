@@ -1,0 +1,4 @@
+select al.business_id, b.company_name, al.created_at  as AccountCreated, al.balance ->> 'available'
+from businesses as b, accounts as al 
+where al.business_id = b.id 
+and  ((al.balance ->> 'available'):: float) > '150000.00'
