@@ -1,0 +1,11 @@
+select 
+--	extract(month from created_date) as month_nbr,
+--	to_char(created_date,'Mon') AS month,
+--    extract(year from created_date) as yyyy,
+	COUNT(amount),
+	SUM(ABS(amount))
+from transactions
+where created_date >= '2021-11-05' and created_date <= '2021-11-11'	
+and type = 'debit' 
+--group by month_nbr, month, yyyy
+--order by yyyy,month_nbr 
