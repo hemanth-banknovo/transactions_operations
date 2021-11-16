@@ -1,0 +1,13 @@
+select 
+--	extract(month from e.created_at) as month_nbr,
+--	to_char(e.created_at,'Mon') AS month,
+--    extract(year from e.created_at) as yyyy,
+    COUNT(p.id),
+	SUM(ABS(p.amount))
+from transfer_events as e, transfers as p 
+where p.id = e.transfer_id
+and e.event in ('returned')
+and e.created_at between ((timestamp '2021-10-29 00:00:00') AT TIME ZONE 'EST') 
+								 AND ((timestamp '2021-11-04 23:59:59') AT TIME ZONE 'EST')					 
+--group by month_nbr, month, yyyy
+--order by yyyy,month_nbr 
