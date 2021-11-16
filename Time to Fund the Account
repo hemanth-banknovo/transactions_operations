@@ -1,0 +1,13 @@
+WITH funded_account as (select /*distinct business_id as biz,*/
+                               DATE_PART('day', TO_DATE(meta ->> 'accountFundedAt', 'YYYY-MM-DD"T"HH24:MI:SS:000"Z"')::timestamp - created_at::timestamp)   as age
+                        from accounts
+                        where meta ->> 'accountFundedAt' notnull
+                        /*and business_id in (select business_id from onboarding_applications_view where referral_source = 'azlo')*/
+                        and to_timestamp((accounts.meta->>'accountFundedAt'),'YYYY-MM-DD"T"HH24:MI:SS"Z"')::DATE  between '2021-10-29'  and '2021-11-04'),
+
+     result_funded_account as (select /*biz,*/
+                                      avg(age)    as          "Avg Time To Fund"
+                               from funded_account
+                               /*group by biz*/)
+select *
+from result_funded_account;
